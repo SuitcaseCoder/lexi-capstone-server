@@ -17,7 +17,7 @@ app.use(express.static('public'));
 // GET 
 //get all words
 app.get('/words', (req,res) => {
-    Word
+    Words
         .find()
         // .exec()
         .then(words => {
