@@ -1,6 +1,7 @@
 
 'use strict';
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const mongoose = require('mongoose');
 
@@ -13,6 +14,7 @@ const jsonParser = bodyParser.json();
 mongoose.Promise = global.Promise;
 
 app.use(express.static('public'));
+app.use(cors());
 
 // GET 
 //get all words
