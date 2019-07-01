@@ -78,7 +78,7 @@ describe('Words', function(){
 
       it('should add word item on POST', function(){
         return chai.request(app)
-        .post('/add-word')
+        .post('/words')
         .then(function(res){
           expect(res).to.have.status(400);
           expect(res.body).to.be.a('object');

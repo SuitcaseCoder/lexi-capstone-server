@@ -1,10 +1,12 @@
 const mongoose = require('mongoose');
 
 const wordsSchema = mongoose.Schema({
-    words: [{
-        word: {type: String, required: true},
-        definition: {type: String, required: true}
-    }]
+    word: {type: String, required: true},
+    definition: {type: String, required: true}
+    // words: [{
+    //     word: {type: String, required: true},
+    //     definition: {type: String, required: true}
+    // }]
 });
 
 const usersSchema = mongoose.Schema({
@@ -18,5 +20,4 @@ const usersSchema = mongoose.Schema({
 const Users = mongoose.model('Users', usersSchema);
 const Words = mongoose.model('Words', wordsSchema);
 
-module.exports = {Words};
-module.exports = {Users};
+module.exports = {Words, Users};

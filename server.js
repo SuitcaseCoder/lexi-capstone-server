@@ -16,12 +16,13 @@ app.use(express.static('public'));
 
 // GET 
 //get all words
-app.get('/', (req,res) => {
-    Words
+app.get('/words', (req,res) => {
+    Word
         .find()
-        .exec()
+        // .exec()
         .then(words => {
-        return res.json(words)
+            console.log(words);
+         return res.json(words)
         })
         .catch(err => {
         console.log(err);
@@ -31,8 +32,7 @@ app.get('/', (req,res) => {
 
 // POST
 //post new word to all words
-app.post('/', jsonParser, (req, res) => {
-    // ensure `name` and `budget` are in request body
+app.post('/words', jsonParser, (req, res) => {
     const requiredFields = ['word', 'definition'];
     for (let i=0; i<requiredFields.length; i++) {
         const field = requiredFields[i];
@@ -50,7 +50,6 @@ app.post('/', jsonParser, (req, res) => {
         })
         .then(
         event => res.status(201).json(event)
-        // .json(obj)
         )
         .catch(err => {
         console.log(err);
