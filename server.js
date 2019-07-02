@@ -13,8 +13,8 @@ const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 mongoose.Promise = global.Promise;
 
-app.use(express.static('public'));
 app.use(cors());
+app.use(express.static('public'));
 
 // GET 
 //get all words
@@ -35,6 +35,7 @@ app.get('/words', (req,res) => {
 // POST
 //post new word to all words
 app.post('/words', jsonParser, (req, res) => {
+    console.log(req.body);
     const requiredFields = ['word', 'definition'];
     for (let i=0; i<requiredFields.length; i++) {
         const field = requiredFields[i];
