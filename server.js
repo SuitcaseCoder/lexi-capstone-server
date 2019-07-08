@@ -217,16 +217,11 @@ app.get("/api/protected", jwtAuth, (req, res) => {
 
 //DELETE
 // delete word from list of all words
-app.delete('/delete/protected', jwtAuth, (req, res) => {
+app.delete('/delete/:id', jwtAuth, (req, res) => {
     Word
-        .findByIdAndRemove(req.params._id)
-        .then(word =>
-            console.log(`----------------------------`, word))
-        // res.status(204).end())
-        .catch(err =>
-        console.log(err))
-        res.status(500).json({message:'Internal server error'})
-        ;
+    .findByIdAndRemove(req.params.id)
+    .then(word => res.status(204).end())
+    .catch(err => res.status(500).json({message: "Internal server error"}));     
 })
 
 //RUN SERVER
