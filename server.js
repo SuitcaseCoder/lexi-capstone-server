@@ -1,15 +1,19 @@
 
 'use strict';
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const app = express();
 const mongoose = require('mongoose');
-// const morgan = require('morgan');
-// const passport = require('passport');
+const morgan = require('morgan');
+const passport = require('passport');
 
 const {PORT, DATABASE_URL} = require('./config');
 const {Word} = require('./models');
 const{User} = require('./models');
+
+
+const {router: authRouter, localStrategy, jwtStrategy} = require('./auth');
 
 const bodyParser = require('body-parser');
 
@@ -19,12 +23,23 @@ mongoose.Promise = global.Promise;
 app.use(cors());
 app.use(express.static('public'));
 
+app.use(morgan('common'));
+
+passport.use(localStrategy);
+passport.use(jwtStrategy);
+
+app.use('/api/auth', authRouter);
+
+// const jwtAuth = passport.authenticate('jwt', {session: false});
+
+
 // GET 
 //get all words
 //change this to get all words under a specific user
 //so first get the speicific user /{user} then get the words /{words}
 
 // ----------------------------------------------------
+// change first line to ... app.get('words/protected' , jwtAuth, (req,res))
 // app.get('/words', (req,res) => {
 //     Word
 //         .find()
@@ -99,7 +114,7 @@ app.post('/words', jsonParser, (req, res) => {
             res.status(201).json(word)
         )
         .catch(err => {
-        console.log(err);
+        console.log(`error on line server 116`, err);
         res.status(500).json({message: 'Internal server error'});
         });
 });
@@ -171,7 +186,9 @@ app.post('/create-user', jsonParser, (req,res)=>{
     firstName = firstName.trim();
     lastName = lastName.trim();
     
-    return User.find({username})
+    //needed full key-value pair. OR findbyId with (id)
+    // find where the error is taking place, visit documentation to view examples
+    return User.find({username:username})
         .count()
         .then(count => {
             if (count > 0 ){
@@ -185,7 +202,9 @@ app.post('/create-user', jsonParser, (req,res)=>{
             return User.hashPassword(password);
         })
         .then(hash => {
-            return URIError.create({
+            console.log(` we are logging the hash here server 204`, hash);
+            // return res.send(hash)
+            return User.create({
                 username,
                 password: hash,
                 firstName,
@@ -193,17 +212,18 @@ app.post('/create-user', jsonParser, (req,res)=>{
             });
         })
         .then(user => {
+            // console.log(`this is the user on line 214 `, user)
             return res.status(201).json(user.serialize());
         })
         .catch(err => {
             if (err.reason === 'ValidationError') {
                 return res.status(err.code).json(err);
             }
-            res.status(500).json({code: 500, message: 'Internal server error'});
+            res.status(500).json({code: 500, message: 'Internal server error',});
         });
 });
 
-app.get('/', (req,res)=> {
+app.get('/', (req,res) => {
     return User.find()
         .then(users => res.json(users.map(user => user.serialize())))
         .catch(err => res.status(500).json({message: 'Internal server error'}));
@@ -211,34 +231,6 @@ app.get('/', (req,res)=> {
 
 // --------------------------------------------------------          
 
-// POST
-//post new user at user signup
-// app.post('/create-user', jsonParser, (req, res) => {
-//     console.log(req.body);
-//     const requiredFields = ['name', 'email', 'password'];
-//     for (let i=0; i<requiredFields.length; i++) {
-//         const field = requiredFields[i];
-//         if (!(field in req.body)) {
-//         const message = `Missing \`${field}\` in request body`
-//         console.log(message);
-//         return res.status(400).send(message);
-//         }
-//     }
-
-//     Users
-//         .create({
-//         name: req.body.name,
-//         email: req.body.email,
-//         password: req.body.password
-//         })
-//         .then(
-//         user => res.status(201).json(user)
-//         )
-//         .catch(err => {
-//         console.log(err);
-//         res.status(500).json({message: 'Internal server error'});
-//         });
-// });
 
 //DELETE
 // delete word from list of all words
@@ -256,6 +248,7 @@ app.delete('/delete/:id', (req, res) => {
 //RUN SERVER
 let server;
 function runServer(port, databaseUrl){
+    console.log(`db url = `, databaseUrl);
 return new Promise( (resolve, reject) => {
     mongoose.set('debug', true);
     mongoose.connect(databaseUrl,
@@ -285,6 +278,7 @@ return new Promise((resolve, reject) => {
     console.log("Closing server");
     server.close(err => {
     if (err) {
+        //should this be: return reject(err);
         reject(err);
         return;
     }

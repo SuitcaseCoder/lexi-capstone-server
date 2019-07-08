@@ -47,10 +47,6 @@ const UserSchema = mongoose.Schema({
 const WordSchema = mongoose.Schema({
     word: {type: String, required: true},
     definition: {type: String, required: true}
-    // words: [{
-    //     word: {type: String, required: true},
-    //     definition: {type: String, required: true}
-    // }]
 });
 
 UserSchema.methods.validatePassword = function(password) {
