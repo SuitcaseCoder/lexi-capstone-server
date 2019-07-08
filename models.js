@@ -44,6 +44,15 @@ const UserSchema = mongoose.Schema({
     words: [{type: mongoose.Schema.Types.ObjectId, ref: 'Words'}]
 });
 
+UserSchema.methods.serialize = function() {
+    return {
+        id: this._id,
+        username: this.username || '',
+        firstName: this.firstName || '',
+        lastName: this.lastName || ''
+    };
+};
+
 const WordSchema = mongoose.Schema({
     word: {type: String, required: true},
     definition: {type: String, required: true}

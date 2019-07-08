@@ -4,6 +4,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const app = express();
+app.use(express.json());
 const mongoose = require('mongoose');
 const morgan = require('morgan');
 const passport = require('passport');
@@ -17,7 +18,7 @@ const {router: authRouter, localStrategy, jwtStrategy} = require('./auth');
 
 const bodyParser = require('body-parser');
 
-const jsonParser = bodyParser.json();
+// const jsonParser = bodyParser.json();
 mongoose.Promise = global.Promise;
 
 app.use(cors());
@@ -30,7 +31,7 @@ passport.use(jwtStrategy);
 
 app.use('/api/auth', authRouter);
 
-// const jwtAuth = passport.authenticate('jwt', {session: false});
+const jwtAuth = passport.authenticate('jwt', {session: false});
 
 
 // GET 
@@ -40,19 +41,19 @@ app.use('/api/auth', authRouter);
 
 // ----------------------------------------------------
 // change first line to ... app.get('words/protected' , jwtAuth, (req,res))
-// app.get('/words', (req,res) => {
-//     Word
-//         .find()
-//         // .exec()
-//         .then(words => {
-//             console.log(words);
-//          return res.json(words)
-//         })
-//         .catch(err => {
-//         console.log(err);
-//         return res.status(500).json({message: 'internal server error'});
-//         });
-// });
+app.get('/words/protected', jwtAuth, (req,res) => {
+    Word
+        .find()
+        // .exec()
+        .then(words => {
+            console.log(words);
+         return res.json(words)
+        })
+        .catch(err => {
+        console.log(err);
+        return res.status(500).json({message: 'internal server error'});
+        });
+});
 // ----------------------------------------------------
 
 
@@ -76,7 +77,7 @@ app.use('/api/auth', authRouter);
 // POST
 //post new word to specific user account
 // later change to /{user}/words
-app.post('/words', jsonParser, (req, res) => {
+app.post('/create-word/protected', jwtAuth, (req, res) => {
     console.log(req.body);
     const requiredFields = ['word', 'definition'];
     for (let i=0; i<requiredFields.length; i++) {
@@ -92,26 +93,7 @@ app.post('/words', jsonParser, (req, res) => {
         .create({
             word: req.body.word,
             definition: req.body.definition
-        }).then(word => 
-// -------------------------------------------------- words under users
-//         .then(word => {
-//             console.log(word);
-
-//             Users.findByIdAndUpdate(req.body.users, {
-//                 $push: {words:word._id}
-//             })
-//             .then( _ => {
-//                 return res.status(201).json(word)}
-//             )}
-//         )
-//             .catch(err => {
-//                 console.log(err);
-//                 res.status(500).json({message: 'Internal server error'});
-//             });
-// });
-// --------------------------------------------------------          
-            
-            res.status(201).json(word)
+        }).then(word => res.status(201).json(word)
         )
         .catch(err => {
         console.log(`error on line server 116`, err);
@@ -122,7 +104,7 @@ app.post('/words', jsonParser, (req, res) => {
 // --------------------------------------------------------          
 // POST TO REGISTER A NEW USER
 
-app.post('/create-user', jsonParser, (req,res)=>{
+app.post('/create-user', (req,res)=>{
     const requiredFields = ['username', 'password', 'firstName', 'lastName'];
     const missingField = requiredFields.find(field => !(field in req.body));
 
@@ -202,8 +184,6 @@ app.post('/create-user', jsonParser, (req,res)=>{
             return User.hashPassword(password);
         })
         .then(hash => {
-            console.log(` we are logging the hash here server 204`, hash);
-            // return res.send(hash)
             return User.create({
                 username,
                 password: hash,
@@ -212,7 +192,6 @@ app.post('/create-user', jsonParser, (req,res)=>{
             });
         })
         .then(user => {
-            // console.log(`this is the user on line 214 `, user)
             return res.status(201).json(user.serialize());
         })
         .catch(err => {
@@ -223,22 +202,27 @@ app.post('/create-user', jsonParser, (req,res)=>{
         });
 });
 
-app.get('/', (req,res) => {
-    return User.find()
-        .then(users => res.json(users.map(user => user.serialize())))
-        .catch(err => res.status(500).json({message: 'Internal server error'}));
+app.get("/api/protected", jwtAuth, (req, res) => {
+       return res.json({  data: "rosebud"  
+     }); 
 });
+
+// app.get('/', (req,res) => {
+//     return User.find()
+//         .then(users => res.json(users.map(user => user.serialize())))
+//         .catch(err => res.status(500).json({message: 'Internal server error'}));
+// });
 
 // --------------------------------------------------------          
 
-
 //DELETE
 // delete word from list of all words
-app.delete('/delete/:id', (req, res) => {
+app.delete('/delete/protected', jwtAuth, (req, res) => {
     Word
-        .findByIdAndRemove(req.params.id)
+        .findByIdAndRemove(req.params._id)
         .then(word =>
-        res.status(204).end())
+            console.log(`----------------------------`, word))
+        // res.status(204).end())
         .catch(err =>
         console.log(err))
         res.status(500).json({message:'Internal server error'})

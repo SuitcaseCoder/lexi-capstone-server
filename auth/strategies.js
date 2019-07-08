@@ -8,11 +8,8 @@ const { User } = require('../models.js');
 
 const localStrategy = new LocalStrategy((username, password, callback) => {
     let user;
-    console.log(`strat line 11 --------------- `, username, password, user);
     User.findOne({username: username})
        .then(_user => {
-        console.log(`hey strat line 13 ---- `, _user, user, );
-
            user = _user;
            if (!user) {
                return Promise.reject({
