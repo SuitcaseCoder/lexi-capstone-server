@@ -207,20 +207,32 @@ app.get("/api/protected", jwtAuth, (req, res) => {
      }); 
 });
 
-// app.get('/', (req,res) => {
-//     return User.find()
-//         .then(users => res.json(users.map(user => user.serialize())))
-//         .catch(err => res.status(500).json({message: 'Internal server error'}));
-// });
-
 // --------------------------------------------------------          
-
+// .find()
+//         // .exec()
+//         .then(words => {
+//             console.log(words);
+//          return res.json(words)
+//         })
 //DELETE
 // delete word from list of all words
 app.delete('/delete/:id', jwtAuth, (req, res) => {
     Word
     .findByIdAndRemove(req.params.id)
-    .then(word => res.status(204).end())
+    .then(() => {
+        Word
+            .find()
+            .then(updatedWordList => {
+                console.log(`updated word list ----------`, updatedWordList);
+                return res.json(updatedWordList)
+            })
+            // .find(res => 
+            // console.log(`delete res here ----------------- `, res)
+            // .then(res.json()))
+    })
+            // res.json()) 
+//change this to res.json()
+        // res.status(204).end())
     .catch(err => res.status(500).json({message: "Internal server error"}));     
 })
 
