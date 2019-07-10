@@ -17,6 +17,7 @@ const{User} = require('./models');
 const {router: authRouter, localStrategy, jwtStrategy} = require('./auth');
 
 const bodyParser = require('body-parser');
+mongoose.set('useFindAndModify', false);
 
 // const jsonParser = bodyParser.json();
 mongoose.Promise = global.Promise;
@@ -34,13 +35,38 @@ app.use('/api/auth', authRouter);
 const jwtAuth = passport.authenticate('jwt', {session: false});
 
 
-// GET 
-//get all words
-//change this to get all words under a specific user
-//so first get the speicific user /{user} then get the words /{words}
+app.put('/editWord/:id', jwtAuth, (req, res) => {
+    Word
+    .findByIdAndUpdate(req.params.id, {
+        word: req.body.updatedWord,
+        definition: req.body.updatedDef
+    }, 
+    //this is what updates
+    { new: true },
+    function(err, result){
+       if(err){
+           console.log(err);
+       }
+       //bodyparser - server side, translator ( )
+       //json stringify - front-end, turns obj into a string and server reads it using bodyparser
+       //res is what's being sent back, json sends it back as json and give it the thing you're sending back 
+       res.status(200).json(result);
+    })
+    
 
-// ----------------------------------------------------
-// change first line to ... app.get('words/protected' , jwtAuth, (req,res))
+    
+    // .then(res => {
+    //     console.log('response ------------', res);
+    //     res.send('done')}
+    // )
+    // // .then(res => res.status(204).end())
+    // .then(
+    //         //return the updated list of words by using .find() 
+    // )
+})
+
+
+// GET 
 app.get('/words/protected', jwtAuth, (req,res) => {
     Word
         .find()
@@ -203,10 +229,6 @@ app.post('/create-user', (req,res)=>{
         });
 });
 
-app.get("/api/protected", jwtAuth, (req, res) => {
-       return res.json({  data: "rosebud"  
-     }); 
-});
 
 
 app.delete('/delete/:id', jwtAuth, (req, res) => {
@@ -222,36 +244,12 @@ app.delete('/delete/:id', jwtAuth, (req, res) => {
     })
 
     .catch(err => res.status(500).json({message: "Internal server error"}));     
-})
+});
 
 // --------------------------------------------------------          
 // handle edit word: put request
 
-app.put('/edit-word/:id'), jwtAuth, (req, res) => {
-    // const requiredFields = ['updatedWord', 'updatedDefinition'];
-    // for (let i=0; i<requiredFields.length; i++){
-    //     const field = requiredFields[i];
-    //     if (!(field in req.body)) {
-    //     const message = `Missing \`${field}\` in request body`
-    //     console.error(message);
-    //     return res.status(400).send(message);
-    //     }
-    // }
-    console.log(`line 240 --------------`);
-    
-    Word
-    .findByIdAndUpdate(req.params.editingWordId, {$set: req.body.word }, function(err, result){
-       if(err){
-           console.log(err);
-       }
-       console.log("--------------- something here--------");
-    });
-    res.send('done')
-    // // .then(res => res.status(204).end())
-    // .then(
-    //         //return the updated list of words by using .find() 
-    // )
-}
+
 
 
 //RUN SERVER
