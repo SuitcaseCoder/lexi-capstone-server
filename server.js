@@ -77,6 +77,7 @@ app.get('/words/protected', jwtAuth, (req,res) => {
 // POST
 //post new word to specific user account
 // later change to /{user}/words
+//remove protected to just /create-word
 app.post('/create-word/protected', jwtAuth, (req, res) => {
     console.log(req.body);
     const requiredFields = ['word', 'definition'];
@@ -207,15 +208,7 @@ app.get("/api/protected", jwtAuth, (req, res) => {
      }); 
 });
 
-// --------------------------------------------------------          
-// .find()
-//         // .exec()
-//         .then(words => {
-//             console.log(words);
-//          return res.json(words)
-//         })
-//DELETE
-// delete word from list of all words
+
 app.delete('/delete/:id', jwtAuth, (req, res) => {
     Word
     .findByIdAndRemove(req.params.id)
@@ -226,15 +219,40 @@ app.delete('/delete/:id', jwtAuth, (req, res) => {
                 console.log(`updated word list ----------`, updatedWordList);
                 return res.json(updatedWordList)
             })
-            // .find(res => 
-            // console.log(`delete res here ----------------- `, res)
-            // .then(res.json()))
     })
-            // res.json()) 
-//change this to res.json()
-        // res.status(204).end())
+
     .catch(err => res.status(500).json({message: "Internal server error"}));     
 })
+
+// --------------------------------------------------------          
+// handle edit word: put request
+
+app.put('/edit-word/:id'), jwtAuth, (req, res) => {
+    // const requiredFields = ['updatedWord', 'updatedDefinition'];
+    // for (let i=0; i<requiredFields.length; i++){
+    //     const field = requiredFields[i];
+    //     if (!(field in req.body)) {
+    //     const message = `Missing \`${field}\` in request body`
+    //     console.error(message);
+    //     return res.status(400).send(message);
+    //     }
+    // }
+    console.log(`line 240 --------------`);
+    
+    Word
+    .findByIdAndUpdate(req.params.editingWordId, {$set: req.body.word }, function(err, result){
+       if(err){
+           console.log(err);
+       }
+       console.log("--------------- something here--------");
+    });
+    res.send('done')
+    // // .then(res => res.status(204).end())
+    // .then(
+    //         //return the updated list of words by using .find() 
+    // )
+}
+
 
 //RUN SERVER
 let server;
