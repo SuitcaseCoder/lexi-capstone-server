@@ -34,9 +34,7 @@ app.use('/api/auth', authRouter);
 
 const jwtAuth = passport.authenticate('jwt', {session: false});
 
-app.get('/', function(req, res){
-    res.redirect('/todo');
- });
+
 // ---------- EDIT WORD -----------------          
 app.put('/editWord/:id', jwtAuth, (req, res) => {
     Word
