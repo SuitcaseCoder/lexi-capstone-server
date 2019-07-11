@@ -34,7 +34,10 @@ app.use('/api/auth', authRouter);
 
 const jwtAuth = passport.authenticate('jwt', {session: false});
 
-
+app.get('/', function(req, res){
+    res.redirect('/todo');
+ });
+// ---------- EDIT WORD -----------------          
 app.put('/editWord/:id', jwtAuth, (req, res) => {
     Word
     .findByIdAndUpdate(req.params.id, {
@@ -52,25 +55,13 @@ app.put('/editWord/:id', jwtAuth, (req, res) => {
        //res is what's being sent back, json sends it back as json and give it the thing you're sending back 
        res.status(200).json(result);
     })
-    
-
-    
-    // .then(res => {
-    //     console.log('response ------------', res);
-    //     res.send('done')}
-    // )
-    // // .then(res => res.status(204).end())
-    // .then(
-    //         //return the updated list of words by using .find() 
-    // )
 })
 
 
-// GET 
+// ---------- GET WORDS -----------------          
 app.get('/words/protected', jwtAuth, (req,res) => {
     Word
         .find()
-        // .exec()
         .then(words => {
             console.log(words);
          return res.json(words)
@@ -80,30 +71,10 @@ app.get('/words/protected', jwtAuth, (req,res) => {
         return res.status(500).json({message: 'internal server error'});
         });
 });
-// ----------------------------------------------------
 
-
-// app.get('/{user}/words', (req,res)=> {
-//     Users
-//         .findById(req.body.user)
-//         .populate('words')
-//         // .exec()
-//         .then(users => {
-//             console.log(users);
-//             return res.json(users)
-//         })
-//         .catch(err => {
-//             console.log(err => {
-//                 console.log(err);
-//                 return res.status(500).json({message: 'internal server error'})
-//             })
-//         });
-// });
-
-// POST
-//post new word to specific user account
-// later change to /{user}/words
+// ---------- CREATE WORD -----------------          
 //remove protected to just /create-word
+
 app.post('/create-word/protected', jwtAuth, (req, res) => {
     console.log(req.body);
     const requiredFields = ['word', 'definition'];
@@ -128,8 +99,7 @@ app.post('/create-word/protected', jwtAuth, (req, res) => {
         });
 });
 
-// --------------------------------------------------------          
-// POST TO REGISTER A NEW USER
+// ---------- CREATE USER -----------------          
 
 app.post('/create-user', (req,res)=>{
     const requiredFields = ['username', 'password', 'firstName', 'lastName'];
@@ -230,6 +200,7 @@ app.post('/create-user', (req,res)=>{
 });
 
 
+// ---------- DELETE WORD -----------------          
 
 app.delete('/delete/:id', jwtAuth, (req, res) => {
     Word
@@ -246,21 +217,18 @@ app.delete('/delete/:id', jwtAuth, (req, res) => {
     .catch(err => res.status(500).json({message: "Internal server error"}));     
 });
 
-// --------------------------------------------------------          
-// handle edit word: put request
 
 
-
-
-//RUN SERVER
+// ---------- RUN SERVER -----------------          
 let server;
 function runServer(port, databaseUrl){
-    console.log(`db url = `, databaseUrl);
+    console.log(`db url = `, databaseUrl, port);
 return new Promise( (resolve, reject) => {
     mongoose.set('debug', true);
     mongoose.connect(databaseUrl,
         err => {
         if (err){
+            console.log('-------first err in runServer ----------------',err);
             return reject(err);
         }
         else{
@@ -269,6 +237,7 @@ return new Promise( (resolve, reject) => {
             resolve();
             })
             .on('error', err => {
+                console.log(`error on run server in server file -----------------`, err);
             mongoose.disconnect();
             return reject(err);
             });
@@ -279,6 +248,7 @@ return new Promise( (resolve, reject) => {
 });
 }
 
+// ---------- CLOSE SERVER -----------------          
 
 function closeServer() {
 return new Promise((resolve, reject) => {
