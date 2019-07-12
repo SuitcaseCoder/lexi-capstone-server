@@ -55,19 +55,25 @@ app.put('/editWord/:id', jwtAuth, (req, res) => {
     })
 })
 
-
+//jwt strategy is not extracting properly
 // ---------- GET WORDS -----------------          
 app.get('/words/protected', jwtAuth, (req,res) => {
+    console.log('req.user._id .....', req.user.id);
     Word
-        .find()
-        .then(words => {
-            console.log(words);
-         return res.json(words)
+        .find({
+            userId: req.user.id
         })
-        .catch(err => {
-        console.log(err);
-        return res.status(500).json({message: 'internal server error'});
-        });
+        .exec(function (err, user){
+            // console.log(' user by id ............', user)
+            return res.json(user)
+        })
+        // .then(
+        //     console.log(`............`)
+        // )
+        // .catch(err => {
+        // console.log(err);
+        // return res.status(500).json({message: 'internal server error'});
+        // });
 });
 
 // ---------- CREATE WORD -----------------          
@@ -84,9 +90,9 @@ app.post('/create-word/protected', jwtAuth, (req, res) => {
         return res.status(400).send(message);
         }
     }
-
     Word
         .create({
+            userId: req.user.id,
             word: req.body.word,
             definition: req.body.definition
         }).then(word => res.status(201).json(word)

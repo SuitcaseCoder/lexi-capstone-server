@@ -41,7 +41,7 @@ const UserSchema = mongoose.Schema({
     lastName: {type: String, required: true},
     username: {type: String, required: true, unique: true},
     password: {type: String, required: true},
-    words: [{type: mongoose.Schema.Types.ObjectId, ref: 'Word'}]
+    // words: [{type: mongoose.Schema.Types.ObjectId, ref: 'Word'}]
 });
 
 UserSchema.methods.serialize = function() {
@@ -54,6 +54,7 @@ UserSchema.methods.serialize = function() {
 };
 
 const WordSchema = mongoose.Schema({
+    userId: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     word: {type: String, required: true},
     definition: {type: String, required: true}
 });
