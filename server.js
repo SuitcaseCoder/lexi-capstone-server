@@ -159,7 +159,7 @@ app.post('/create-user', (req,res)=>{
             code: 422,
             reason: 'ValidationError',
             message: tooSmallField 
-                ? `Must be at least ${sizedFields[tooSmallField].min} characters long`
+                ? `Must be at least ${sizedFields[tooSmallField].min} character long`
                 : `Must be at most ${sizedFields[tooLargeField].max} characters long`,
             location: tooSmallField || tooLargeField
         });
