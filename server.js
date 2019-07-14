@@ -55,7 +55,6 @@ app.put('/editWord/:id', jwtAuth, (req, res) => {
     })
 })
 
-//jwt strategy is not extracting properly
 // ---------- GET WORDS -----------------          
 app.get('/words/protected', jwtAuth, (req,res) => {
     console.log('req.user._id .....', req.user.id);
@@ -207,6 +206,17 @@ app.post('/create-user', (req,res)=>{
 // ---------- DELETE WORD -----------------          
 
 app.delete('/delete/:id', jwtAuth, (req, res) => {
+    console.log('~~~~~~~~~~~~req.WORD ~~~~~~~~~~', req.word);
+    
+    ///
+    Word
+    .find({
+        userId: req.user.id,
+    })
+    .exec(function (err, user){
+        console.log(' user by id ............', user)
+        return res.json(user)
+    }),
     Word
     .findByIdAndRemove(req.params.id)
     .then(() => {
