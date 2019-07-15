@@ -205,23 +205,23 @@ app.post('/create-user', (req,res)=>{
 
 // ---------- DELETE WORD -----------------          
 
-app.delete('/delete/:id', jwtAuth, (req, res) => {
-    console.log('~~~~~~~~~~~~req.WORD ~~~~~~~~~~', req.word);
-    
+app.delete('/delete/:id', jwtAuth, (req, res) => {    
     ///
-    Word
-    .find({
-        userId: req.user.id,
-    })
-    .exec(function (err, user){
-        console.log(' user by id ............', user)
-        return res.json(user)
-    }),
+    // Word
+    // .find({
+    //     userId: req.user.id,
+    // })
+    // .exec(function (err, user){
+    //     console.log(' user by id ............', user)
+    //     return res.json(user)
+    // })
     Word
     .findByIdAndRemove(req.params.id)
     .then(() => {
         Word
-            .find()
+            .find({
+                userId: req.user.id
+            })
             .then(updatedWordList => {
                 console.log(`updated word list ----------`, updatedWordList);
                 return res.json(updatedWordList)
