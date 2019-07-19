@@ -35,6 +35,18 @@ app.use('/api/auth', authRouter);
 const jwtAuth = passport.authenticate('jwt', {session: false});
 
 
+// ---------- GET ALL WORDS -----------------          
+// app.get('/allWords', (req,res) => {
+//     Word
+//         .find()
+//         .then( (res) => res.json()
+//         )
+//         .catch(err => {
+//         console.log(err);
+//         return res.status(500).json({message: 'internal server error'});
+//         });
+// });
+
 // ---------- EDIT WORD -----------------          
 app.put('/editWord/:id', jwtAuth, (req, res) => {
     Word
