@@ -36,16 +36,15 @@ const jwtAuth = passport.authenticate('jwt', {session: false});
 
 
 // ---------- GET ALL WORDS -----------------          
-// app.get('/allWords', (req,res) => {
-//     Word
-//         .find()
-//         .then( (res) => res.json()
-//         )
-//         .catch(err => {
-//         console.log(err);
-//         return res.status(500).json({message: 'internal server error'});
-//         });
-// });
+app.get('/allWords', (req,res) => {
+    Word
+        .find()
+        .then(allWords => res.json(allWords))
+        .catch(err => {
+        console.log(err);
+        return res.status(500).json({message: 'internal server error'});
+        });
+});
 
 // ---------- EDIT WORD -----------------          
 app.put('/editWord/:id', jwtAuth, (req, res) => {
@@ -254,7 +253,7 @@ return new Promise( (resolve, reject) => {
     mongoose.connect(databaseUrl,
         err => {
         if (err){
-            console.log('-------first err in runServer ----------------',err);
+            console.log('-------first err in runServer ----------------',err, '------------------------------');
             return reject(err);
         }
         else{
